@@ -1,0 +1,27 @@
+name: Deploy Nginx Pod to Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${KUBECONFIG_DATA}" > ~/.kube/config
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_DATA }}
+
+      - name: Verify cluster access
+        run: kubectl get nodes
+
+      - name: Deploy nginx pod
+        run: kubectl apply -f k8s/nginx-pod.yaml
