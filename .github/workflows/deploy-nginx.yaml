@@ -1,4 +1,4 @@
-name: Deploy Nginx Pod to Kubernetes
+name: Deploy Nginx Pod
 
 on:
   push:
@@ -13,15 +13,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up kubeconfig
-        run: |
-          mkdir -p ~/.kube
-          echo "${KUBECONFIG_DATA}" > ~/.kube/config
-        env:
-          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_DATA }}
-
-      - name: Verify cluster access
-        run: kubectl get nodes
-
       - name: Deploy nginx pod
-        run: kubectl apply -f k8s/nginx-pod.yaml
+        run: |
+          kubectl apply -f k8s/nginx-pod.yaml \
+            --server=${{ secrets.K8S_SERVER }} \
+            --token=${{ secrets.K8S_TOKEN }} \
+            --insecure-skip-tls-verify=true
